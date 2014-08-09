@@ -1,0 +1,69 @@
+<?php
+/**
+ * @file
+ * Hook implementations for mltsolr module.
+ */
+
+/**
+ * Implements hook_menu().
+ */
+function mltsolr_menu() {
+  $items = array();
+
+  // This is our API resource to obtain a list of related teasers for an nid.
+  $items['api/1.0/more_like_this/%node'] = array(
+    'page callback' => 'mltsolr_more_like_this',
+    'page arguments' => array(3),
+    'access callback' => 'mltsolr_more_like_this_access',
+    'access arguments' => array(3),
+    'delivery callback' => 'mltsolr_deliver',
+    'file' => 'mltsolr.pages.inc',
+    'type' => MENU_CALLBACK,
+  );
+
+  return $items;
+}
+
+/**
+ * Simple delivery callback to return just the callback result.
+ */
+function mltsolr_deliver($callback_result) {
+  print $callback_result;
+}
+
+/**
+ * Access callback for More Like This.
+ */
+function mltsolr_more_like_this_access($node) {
+  return node_access('view', $node);
+}
+
+/**
+ * Implements hook_ctools_plugin_directory().
+ */
+function mltsolr_ctools_plugin_directory($owner, $plugin_type) {
+  // Safety: go away if CTools is not at an appropriate version.
+  if (!module_invoke('ctools', 'api_version', PANELS_REQUIRED_CTOOLS_API)) {
+    return;
+  }
+
+  // We only care about Form 2 of this hook.
+  if (in_array($owner, array('page_manager', 'panels', 'ctools', 'stylizer'))) {
+    return 'plugins/' . $plugin_type;
+  }
+}
+
+/**
+ * Implements hook_theme().
+ */
+function mltsolr_theme($existing, $type, $theme, $path) {
+  $theme_path = $path . '/templates';
+
+  return array(
+    'more_like_this' => array(
+      'variables' => array('nid' => NULL),
+      'path' => $theme_path,
+      'template' => 'more-like-this',
+    ),
+  );
+}

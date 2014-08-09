@@ -1,0 +1,8 @@
+name = More Like This Solr
+description = Sample Ctools plugin to render a list of related content.
+core = 7.x
+package = custom
+version = 7.x-1.0
+dependencies[] = apachesolr
+dependencies[] = panels
+dependencies[] = ctools
