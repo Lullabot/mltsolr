@@ -22,29 +22,29 @@ function mltsolr_more_like_this($node) {
     $content_type_filter->addFilter('bundle', $content_type);
   }
 
-  // Build the issues filter.
-  $issues = array();
-  if (!empty($node->field_issues[LANGUAGE_NONE])) {
-    foreach ($node->field_issues[LANGUAGE_NONE] as $issue) {
-      $issues[] = 'node:' . $issue['target_id'];
-    }
+  // Build the Issues filter.
+$issues = array();
+if ($items = field_get_items('node', $node, 'field_issues')) {
+  foreach ($items as $issue) {
+    $issues[] = 'node:' . $issue['target_id'];
   }
-  $issues_filter = new SolrFilterSubQuery('OR');
-  foreach ($issues as $issue) {
-    $issues_filter->addFilter('sm_field_issues', $issue);
-  }
+}
+$issues_filter = new SolrFilterSubQuery('OR');
+foreach ($issues as $issue) {
+  $issues_filter->addFilter('sm_field_issues', $issue);
+}
 
-  // Build the topics filter.
-  $topics = array();
-  if (!empty($node->field_topics[LANGUAGE_NONE])) {
-    foreach ($node->field_topics[LANGUAGE_NONE] as $topic) {
-      $topics[] = 'node:' . $topic['target_id'];
-    }
+// Build the Topics filter.
+$topics = array();
+if ($items = field_get_items('node', $node, 'field_topics')) {
+  foreach ($items as $topic) {
+    $topics[] = 'node:' . $topic['target_id'];
   }
-  $topics_filter = new SolrFilterSubQuery('OR');
-  foreach ($topics as $topic) {
-    $topics_filter->addFilter('sm_field_topics', $topic);
-  }
+}
+$topics_filter = new SolrFilterSubQuery('OR');
+foreach ($topics as $topic) {
+  $topics_filter->addFilter('sm_field_topics', $topic);
+}
 
   // Leave right now if there are no topics and issues to search for.
   if (empty($topics) && empty($issues)) {
