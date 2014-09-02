@@ -63,8 +63,7 @@ function mltsolr_more_like_this($node) {
 
   try {
     // Create and configure the query.
-    $searcher = 'mltsolr_default_node';
-    $query = apachesolr_drupal_query($searcher);
+    $query = apachesolr_drupal_query('apachesolr');
     // We just want to obtain nids back.
     $query->addParam('fl', 'entity_id');
     // Add the conditions built above.
@@ -80,14 +79,12 @@ function mltsolr_more_like_this($node) {
     // Send the the query to Apache Solr and render results if matches are found.
     list($final_query, $response) = apachesolr_do_query($query, pager_find_page());
     if ($response->code == '200' && $response->response->numFound > 0) {
-      $nodes = array();
       // Extract nids from the response and load them.
+      $nids = array();
       foreach ($response->response->docs as $result) {
-        $node = node_load($result->entity_id);
-        if (!empty($node)) {
-          $nodes[] = $node;
-        }
+        $nids[] = $result->entity_id;
       }
+      $nodes = node_load_multiple($nids);
       if (count($nodes)) {
         // Build and return the list of teasers.
         $output = '<ul>';
